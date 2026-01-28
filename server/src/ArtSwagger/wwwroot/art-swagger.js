@@ -22,7 +22,10 @@
         bearerToken: '',
         theme: 'auto',
         searchIndex: [],
-        selectedSearchIndex: -1
+        selectedSearchIndex: -1,
+        // Tab management
+        openTabs: [],       // Array of { id, path, method, title, operation }
+        activeTabId: null
     };
 
     // ============================================
@@ -67,7 +70,8 @@
         elements.content = document.getElementById('content');
         elements.welcomePanel = document.getElementById('welcomePanel');
         elements.welcomeStats = document.getElementById('welcomeStats');
-        elements.apiDetail = document.getElementById('apiDetail');
+        elements.tabsBar = document.getElementById('tabsBar');
+        elements.tabPanels = document.getElementById('tabPanels');
         elements.searchModal = document.getElementById('searchModal');
         elements.globalSearchInput = document.getElementById('globalSearchInput');
         elements.searchResults = document.getElementById('searchResults');
@@ -461,8 +465,11 @@
 
     function showWelcome() {
         elements.welcomePanel.style.display = '';
-        elements.apiDetail.style.display = 'none';
+        elements.tabPanels.classList.remove('active');
         state.currentOperation = null;
+        state.openTabs = [];
+        state.activeTabId = null;
+        elements.tabsBar.innerHTML = '';
 
         // Remove active state from nav items
         elements.apiNav.querySelectorAll('.art-nav-item').forEach(item => {
@@ -471,35 +478,164 @@
     }
 
     // ============================================
-    // Operation Detail
+    // Tab Management
     // ============================================
-    function selectOperation(path, method) {
+    const MAX_TABS = 10; // Maximum number of open tabs
+
+    function generateTabId(path, method) {
+        return `tab_${method}_${path.replace(/[^a-zA-Z0-9]/g, '_')}`;
+    }
+
+    function openTab(path, method) {
         const operation = state.operations.find(op => op.path === path && op.method === method);
         if (!operation) return;
 
-        state.currentOperation = operation;
+        const tabId = generateTabId(path, method);
+
+        // Check if tab already exists
+        const existingTab = state.openTabs.find(t => t.id === tabId);
+        if (existingTab) {
+            activateTab(tabId);
+            return;
+        }
+
+        // If too many tabs, close the oldest one (not the active one)
+        while (state.openTabs.length >= MAX_TABS) {
+            const oldestTab = state.openTabs.find(t => t.id !== state.activeTabId);
+            if (oldestTab) {
+                closeTab(oldestTab.id);
+            } else {
+                // All tabs are active? Close the first one
+                closeTab(state.openTabs[0].id);
+            }
+        }
+
+        // Create new tab
+        const newTab = {
+            id: tabId,
+            path,
+            method,
+            title: operation.summary || path,
+            operation
+        };
+        state.openTabs.push(newTab);
+
+        renderTabs();
+        activateTab(tabId);
 
         // Update nav active state
+        updateNavActiveState(path, method);
+    }
+
+    function closeTab(tabId, event) {
+        if (event) {
+            event.stopPropagation();
+        }
+
+        const tabIndex = state.openTabs.findIndex(t => t.id === tabId);
+        if (tabIndex === -1) return;
+
+        state.openTabs.splice(tabIndex, 1);
+
+        // Remove tab panel
+        const panel = document.getElementById(`panel_${tabId}`);
+        if (panel) panel.remove();
+
+        // If closing active tab, activate another
+        if (state.activeTabId === tabId) {
+            if (state.openTabs.length > 0) {
+                // Activate previous tab or first tab
+                const newIndex = Math.min(tabIndex, state.openTabs.length - 1);
+                activateTab(state.openTabs[newIndex].id);
+            } else {
+                // No tabs left, show welcome
+                state.activeTabId = null;
+                state.currentOperation = null;
+                elements.welcomePanel.style.display = '';
+                elements.tabPanels.classList.remove('active');
+                clearNavActiveState();
+            }
+        }
+
+        renderTabs();
+    }
+
+    function activateTab(tabId) {
+        const tab = state.openTabs.find(t => t.id === tabId);
+        if (!tab) return;
+
+        state.activeTabId = tabId;
+        state.currentOperation = tab.operation;
+
+        // Update tab button states
+        elements.tabsBar.querySelectorAll('.art-tab-item').forEach(item => {
+            item.classList.toggle('active', item.dataset.tabId === tabId);
+        });
+
+        // Show/hide panels
+        elements.welcomePanel.style.display = 'none';
+        elements.tabPanels.classList.add('active');
+
+        // Render or show panel
+        let panel = document.getElementById(`panel_${tabId}`);
+        if (!panel) {
+            panel = document.createElement('div');
+            panel.id = `panel_${tabId}`;
+            panel.className = 'art-tab-panel art-api-detail';
+            panel.innerHTML = renderOperationContent(tab.operation);
+            elements.tabPanels.appendChild(panel);
+            initMainTabEvents(panel);
+        }
+
+        // Activate this panel, hide others
+        elements.tabPanels.querySelectorAll('.art-tab-panel').forEach(p => {
+            p.classList.toggle('active', p.id === `panel_${tabId}`);
+        });
+
+        // Update nav
+        updateNavActiveState(tab.path, tab.method);
+    }
+
+    function renderTabs() {
+        elements.tabsBar.innerHTML = state.openTabs.map(tab => `
+            <div class="art-tab-item ${tab.id === state.activeTabId ? 'active' : ''}" 
+                 data-tab-id="${tab.id}" 
+                 onclick="ArtSwagger.activateTab('${tab.id}')">
+                <span class="art-tab-method ${tab.method}">${tab.method.toUpperCase()}</span>
+                <span class="art-tab-title">${escapeHtml(tab.title)}</span>
+                <span class="art-tab-close" onclick="ArtSwagger.closeTab('${tab.id}', event)">
+                    <svg viewBox="0 0 24 24" width="12" height="12"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12 19 6.41z" fill="currentColor"/></svg>
+                </span>
+            </div>
+        `).join('');
+    }
+
+    function updateNavActiveState(path, method) {
         elements.apiNav.querySelectorAll('.art-nav-item').forEach(item => {
             const isActive = item.dataset.path === path && item.dataset.method === method;
             item.classList.toggle('active', isActive);
         });
-
-        renderOperationDetail(operation);
-
-        elements.welcomePanel.style.display = 'none';
-        elements.apiDetail.style.display = '';
-
-        // Scroll content to top
-        elements.content.scrollTop = 0;
     }
 
-    function renderOperationDetail(op) {
+    function clearNavActiveState() {
+        elements.apiNav.querySelectorAll('.art-nav-item').forEach(item => {
+            item.classList.remove('active');
+        });
+    }
+
+    // ============================================
+    // Operation Detail (legacy wrapper)
+    // ============================================
+    function selectOperation(path, method) {
+        openTab(path, method);
+    }
+
+    function renderOperationContent(op) {
         const parameters = resolveParameters(op);
         const requestBody = resolveRequestBody(op);
         const responses = resolveResponses(op);
 
-        elements.apiDetail.innerHTML = `
+        return `
             <!-- Header -->
             <div class="art-api-header">
                 <span class="art-api-method ${op.method}">${op.method.toUpperCase()}</span>
@@ -798,12 +934,41 @@
                 </div>
             </div>
         `;
-
-        // Initialize tabs
-        initMainTabs();
-        initResponseTabs();
     }
 
+    function initMainTabEvents(container) {
+        const tabs = container.querySelectorAll('.art-main-tabs .art-main-tab');
+        tabs.forEach(tab => {
+            tab.addEventListener('click', () => {
+                const tabName = tab.dataset.tab;
+
+                // Update tab buttons
+                tabs.forEach(t => t.classList.toggle('active', t === tab));
+
+                // Update tab content
+                container.querySelector('#tabDocument')?.classList.toggle('active', tabName === 'document');
+                container.querySelector('#tabDebug')?.classList.toggle('active', tabName === 'debug');
+            });
+        });
+
+        // Init response tabs
+        const responseTabs = container.querySelectorAll('.art-tabs .art-tab');
+        responseTabs.forEach(tab => {
+            tab.addEventListener('click', () => {
+                const tabName = tab.dataset.tab;
+
+                // Update tab buttons
+                responseTabs.forEach(t => t.classList.toggle('active', t === tab));
+
+                // Update content
+                container.querySelectorAll('.art-tab-content').forEach(content => {
+                    content.classList.toggle('active', content.id === `tab${tabName.charAt(0).toUpperCase() + tabName.slice(1)}`);
+                });
+            });
+        });
+    }
+
+    // Keep legacy functions for backwards compatibility
     function initMainTabs() {
         const tabs = document.querySelectorAll('#mainTabs .art-main-tab');
         tabs.forEach(tab => {
@@ -1047,12 +1212,16 @@
         const op = state.currentOperation;
         if (!op) return;
 
-        const { url, headers, body } = buildRequest(op);
+        // Find active panel
+        const activePanel = document.querySelector('.art-tab-panel.active');
+        if (!activePanel) return;
+
+        const { url, headers, body } = buildRequest(op, activePanel);
         const startTime = performance.now();
 
         // Show response card
-        const responseCard = document.getElementById('responseCard');
-        responseCard.style.display = '';
+        const responseCard = activePanel.querySelector('#responseCard');
+        if (responseCard) responseCard.style.display = '';
 
         try {
             const response = await fetch(url, {
@@ -1076,24 +1245,30 @@
             }
 
             // Update UI
-            document.getElementById('responseStatus').innerHTML = `
-                <span class="art-status-badge ${response.ok ? 'success' : 'error'}">
-                    ${response.status} ${response.statusText}
-                </span>
-                <span class="art-response-time">${duration}ms</span>
-            `;
+            const responseStatus = activePanel.querySelector('#responseStatus');
+            if (responseStatus) {
+                responseStatus.innerHTML = `
+                    <span class="art-status-badge ${response.ok ? 'success' : 'error'}">
+                        ${response.status} ${response.statusText}
+                    </span>
+                    <span class="art-response-time">${duration}ms</span>
+                `;
+            }
 
-            document.getElementById('responseBody').textContent = responseText;
+            const responseBody = activePanel.querySelector('#responseBody');
+            if (responseBody) responseBody.textContent = responseText;
 
             // Response headers
             const headerLines = [];
             response.headers.forEach((value, key) => {
                 headerLines.push(`${key}: ${value}`);
             });
-            document.getElementById('responseHeaders').textContent = headerLines.join('\n');
+            const responseHeaders = activePanel.querySelector('#responseHeaders');
+            if (responseHeaders) responseHeaders.textContent = headerLines.join('\n');
 
             // Generate cURL
-            document.getElementById('curlCommand').textContent = generateCurl(op, url, headers, body);
+            const curlCommand = activePanel.querySelector('#curlCommand');
+            if (curlCommand) curlCommand.textContent = generateCurl(op, url, headers, body);
 
             state.lastResponse = responseText;
             state.lastCurl = generateCurl(op, url, headers, body);
@@ -1102,20 +1277,28 @@
             const endTime = performance.now();
             const duration = Math.round(endTime - startTime);
 
-            document.getElementById('responseStatus').innerHTML = `
-                <span class="art-status-badge error">Error</span>
-                <span class="art-response-time">${duration}ms</span>
-            `;
+            const responseStatus = activePanel.querySelector('#responseStatus');
+            if (responseStatus) {
+                responseStatus.innerHTML = `
+                    <span class="art-status-badge error">Error</span>
+                    <span class="art-response-time">${duration}ms</span>
+                `;
+            }
 
-            document.getElementById('responseBody').textContent = error.message;
-            document.getElementById('responseHeaders').textContent = '';
-            document.getElementById('curlCommand').textContent = generateCurl(op, url, headers, body);
+            const responseBody = activePanel.querySelector('#responseBody');
+            if (responseBody) responseBody.textContent = error.message;
+
+            const responseHeaders = activePanel.querySelector('#responseHeaders');
+            if (responseHeaders) responseHeaders.textContent = '';
+
+            const curlCommand = activePanel.querySelector('#curlCommand');
+            if (curlCommand) curlCommand.textContent = generateCurl(op, url, headers, body);
 
             showToast(`请求失败: ${error.message}`, 'error');
         }
     }
 
-    function buildRequest(op) {
+    function buildRequest(op, panel) {
         let url = new URL(op.path, window.location.origin);
         const headers = {
             'Accept': 'application/json'
@@ -1126,8 +1309,8 @@
             headers['Authorization'] = `Bearer ${state.bearerToken}`;
         }
 
-        // Collect parameter values from inputs
-        const paramInputs = document.querySelectorAll('[data-param]');
+        // Collect parameter values from inputs within the panel
+        const paramInputs = panel ? panel.querySelectorAll('[data-param]') : document.querySelectorAll('[data-param]');
         paramInputs.forEach(input => {
             const name = input.dataset.param;
             const paramIn = input.dataset.in;
@@ -1146,7 +1329,7 @@
 
         // Request body
         let body = null;
-        const bodyInput = document.getElementById('requestBodyInput');
+        const bodyInput = panel ? panel.querySelector('#requestBodyInput') : document.getElementById('requestBodyInput');
         if (bodyInput && bodyInput.value.trim()) {
             body = bodyInput.value.trim();
             headers['Content-Type'] = 'application/json';
@@ -1170,19 +1353,23 @@
     }
 
     function clearInputs() {
+        // 找到当前激活的标签页面板
+        const activePanel = document.querySelector('.art-tab-panel.active');
+        if (!activePanel) return;
+
         // 重置参数输入框为默认值（placeholder 或空）
-        document.querySelectorAll('#apiDetail .art-param-input').forEach(input => {
+        activePanel.querySelectorAll('.art-param-input').forEach(input => {
             input.value = '';
         });
 
         // 重置请求体为默认示例
-        const requestBodyInput = document.getElementById('requestBodyInput');
+        const requestBodyInput = activePanel.querySelector('#requestBodyInput');
         if (requestBodyInput && state.currentOperation) {
             const requestBody = resolveRequestBody(state.currentOperation);
             requestBodyInput.value = requestBody?.example || '';
         }
 
-        const responseCard = document.getElementById('responseCard');
+        const responseCard = activePanel.querySelector('#responseCard');
         if (responseCard) {
             responseCard.style.display = 'none';
         }
@@ -1191,7 +1378,8 @@
     }
 
     function formatRequestBody() {
-        const textarea = document.getElementById('requestBodyInput');
+        const activePanel = document.querySelector('.art-tab-panel.active');
+        const textarea = activePanel ? activePanel.querySelector('#requestBodyInput') : document.getElementById('requestBodyInput');
         if (!textarea) return;
 
         try {
@@ -1289,7 +1477,8 @@
         const op = state.currentOperation;
         if (!op) return;
 
-        const { url, headers, body } = buildRequest(op);
+        const activePanel = document.querySelector('.art-tab-panel.active');
+        const { url, headers, body } = buildRequest(op, activePanel);
         const curl = generateCurl(op, url, headers, body);
 
         copyToClipboard(curl);
@@ -1381,6 +1570,11 @@
     window.ArtSwagger = {
         // Core
         init,
+
+        // Tabs
+        openTab,
+        closeTab,
+        activateTab,
 
         // Search
         openSearch,

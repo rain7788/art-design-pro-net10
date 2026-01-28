@@ -161,17 +161,26 @@ a:hover {
 }
 
 /* ============================================
-   App Layout
+   App Layout (Art Design Pro Style)
    ============================================ */
 #art-swagger-app {
     display: flex;
-    flex-direction: column;
+    flex-direction: row;
     height: 100vh;
     overflow: hidden;
 }
 
+/* Main Area (Right side) */
+.art-main-area {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    overflow: hidden;
+    background: var(--art-bg-base);
+}
+
 /* ============================================
-   Header
+   Header (Top bar in main area)
    ============================================ */
 .art-header {
     display: flex;
@@ -185,11 +194,22 @@ a:hover {
     z-index: 100;
 }
 
-.art-header-left,
+.art-header-left {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex: 1;
+    min-width: 0;
+    overflow: hidden;
+}
+
 .art-header-right {
     display: flex;
     align-items: center;
     gap: 12px;
+    flex-shrink: 0;
+    margin-left: 16px;
+}
 }
 
 .art-logo {
@@ -213,7 +233,10 @@ a:hover {
 /* Group Selector */
 .art-group-selector {
     position: relative;
-    margin-left: 20px;
+}
+
+.art-header-right .art-group-selector {
+    margin-right: 8px;
 }
 
 .art-group-btn {
@@ -349,16 +372,7 @@ a:hover {
 }
 
 /* ============================================
-   Main Layout
-   ============================================ */
-.art-main {
-    display: flex;
-    flex: 1;
-    overflow: hidden;
-}
-
-/* ============================================
-   Sidebar
+   Sidebar (Art Design Pro Style)
    ============================================ */
 .art-sidebar {
     width: var(--art-sidebar-width);
@@ -370,17 +384,58 @@ a:hover {
     overflow: hidden;
 }
 
+.art-sidebar-header {
+    display: flex;
+    align-items: center;
+    height: var(--art-header-height);
+    padding: 0 16px;
+}
+
+.art-sidebar-header .art-logo {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-weight: 600;
+    font-size: 15px;
+    color: var(--art-text-primary);
+}
+
+.art-sidebar-header .art-logo-icon {
+    width: 28px;
+    height: 28px;
+}
+
+.art-sidebar-header .art-logo-text {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
 .art-sidebar-search {
-    padding: 12px;
-    border-bottom: 1px solid var(--art-border-light);
+    padding: 12px 16px;
+}
+
+.art-search-input-wrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.art-search-input-icon {
+    position: absolute;
+    left: 12px;
+    width: 16px;
+    height: 16px;
+    color: var(--art-text-placeholder);
+    pointer-events: none;
 }
 
 .art-sidebar-input {
     width: 100%;
-    padding: 8px 12px;
+    padding: 10px 14px 10px 36px;
     background: var(--art-bg-input);
-    border: 1px solid var(--art-border-color);
-    border-radius: var(--art-border-radius);
+    border: 1px solid var(--art-border-light);
+    border-radius: 20px;
     color: var(--art-text-primary);
     font-size: 13px;
     outline: none;
@@ -392,8 +447,24 @@ a:hover {
     box-shadow: 0 0 0 3px var(--art-primary-bg);
 }
 
+.art-sidebar-input:focus + .art-search-input-icon,
+.art-search-input-wrapper:focus-within .art-search-input-icon {
+    color: var(--art-primary);
+}
+
 .art-sidebar-input::placeholder {
     color: var(--art-text-placeholder);
+}
+
+/* Group Selector in Sidebar */
+.art-sidebar .art-group-selector {
+    padding: 8px 12px;
+    margin-left: 0;
+}
+
+.art-sidebar .art-group-btn {
+    width: 100%;
+    justify-content: space-between;
 }
 
 .art-nav {
@@ -1092,6 +1163,124 @@ a:hover {
 }
 
 /* ============================================
+   Top Tabs Bar (Browser-like tabs)
+   ============================================ */
+.art-tabs-bar {
+    display: flex;
+    align-items: center;
+    gap: 0;
+    flex: 1;
+    min-width: 0; /* Allow shrinking */
+    overflow: hidden;
+}
+
+.art-tabs-bar::-webkit-scrollbar {
+    display: none;
+}
+
+.art-tab-item {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 10px;
+    min-width: 0; /* Allow shrinking */
+    max-width: 180px;
+    flex: 0 1 auto;
+    background: transparent;
+    border: none;
+    border-right: 1px solid var(--art-border-light);
+    color: var(--art-text-secondary);
+    font-size: 13px;
+    cursor: pointer;
+    transition: var(--art-transition);
+    white-space: nowrap;
+    overflow: hidden;
+}
+
+.art-tab-item:hover {
+    background: var(--art-bg-hover);
+    color: var(--art-text-primary);
+}
+
+.art-tab-item.active {
+    background: var(--art-bg-base);
+    color: var(--art-primary);
+    font-weight: 500;
+    position: relative;
+}
+
+.art-tab-item.active::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: var(--art-primary);
+}
+
+.art-tab-item .art-tab-method {
+    font-size: 10px;
+    font-weight: 600;
+    padding: 2px 5px;
+    border-radius: 3px;
+    text-transform: uppercase;
+    flex-shrink: 0;
+}
+
+.art-tab-item .art-tab-method.get { background: var(--art-info-bg); color: var(--art-info); }
+.art-tab-item .art-tab-method.post { background: var(--art-warning-bg); color: var(--art-warning); }
+.art-tab-item .art-tab-method.put { background: var(--art-success-bg); color: var(--art-success); }
+.art-tab-item .art-tab-method.delete { background: var(--art-danger-bg); color: var(--art-danger); }
+.art-tab-item .art-tab-method.patch { background: var(--art-purple-100); color: var(--art-purple-600); }
+
+.art-tab-item .art-tab-title {
+    flex: 1;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.art-tab-item .art-tab-close {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 16px;
+    height: 16px;
+    border-radius: 3px;
+    opacity: 0;
+    transition: var(--art-transition-fast);
+    flex-shrink: 0;
+}
+
+.art-tab-item:hover .art-tab-close,
+.art-tab-item.active .art-tab-close {
+    opacity: 0.6;
+}
+
+.art-tab-item .art-tab-close:hover {
+    opacity: 1;
+    background: var(--art-danger-bg);
+    color: var(--art-danger);
+}
+
+.art-tab-panels {
+    display: none;
+}
+
+.art-tab-panels.active {
+    display: block;
+}
+
+.art-tab-panel {
+    display: none;
+}
+
+.art-tab-panel.active {
+    display: block;
+}
+
+/* ============================================
    Main Tabs (Document vs Debug)
    ============================================ */
 .art-main-tabs {
@@ -1542,7 +1731,7 @@ a:hover {
 /* Auth Modal */
 .art-auth-dialog {
     position: relative;
-    width: 480px;
+    width: 520px;
     max-width: 90vw;
     background: var(--art-bg-card);
     border: 1px solid var(--art-border-color);
@@ -1612,11 +1801,16 @@ a:hover {
 
 .art-input-group {
     display: flex;
-    gap: 8px;
+    gap: 12px;
 }
 
 .art-input-group .art-input {
     flex: 1;
+    min-width: 0;
+}
+
+.art-input-group .art-btn {
+    flex-shrink: 0;
 }
 
 .art-form-hint {
