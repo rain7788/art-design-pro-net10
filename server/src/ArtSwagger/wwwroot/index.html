@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="%(DocumentTitle)">
+    <title>%(DocumentTitle)</title>
+    <link rel="icon" type="image/svg+xml" href="./favicon.svg">
+    <link rel="stylesheet" href="./art-swagger.css?v=%(Version)">
+</head>
+<body>
+    <div id="art-swagger-app">
+        <!-- Header -->
+        <header class="art-header">
+            <div class="art-header-left">
+                <div class="art-logo">
+                    <svg class="art-logo-icon" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M16 2L4 8v16l12 6 12-6V8L16 2z" fill="var(--art-primary)" opacity="0.2"/>
+                        <path d="M16 2L4 8l12 6 12-6-12-6z" fill="var(--art-primary)"/>
+                        <path d="M4 8v16l12 6V14L4 8z" fill="var(--art-primary)" opacity="0.7"/>
+                        <path d="M28 8v16l-12 6V14l12-6z" fill="var(--art-primary)" opacity="0.5"/>
+                    </svg>
+                    <span class="art-logo-text">%(DocumentTitle)</span>
+                </div>
+                <div class="art-group-selector" id="groupSelector">
+                    <button class="art-group-btn" id="groupToggle">
+                        <span id="currentGroupName">选择分组</span>
+                        <svg class="art-icon" viewBox="0 0 24 24"><path d="M7 10l5 5 5-5H7z" fill="currentColor"/></svg>
+                    </button>
+                    <div class="art-group-dropdown" id="groupDropdown">
+                        <!-- Dynamic groups -->
+                    </div>
+                </div>
+            </div>
+            <div class="art-header-right">
+                <button class="art-search-btn" id="searchBtn" title="搜索 (Ctrl+K)">
+                    <svg class="art-icon" viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27A6.471 6.471 0 0016 9.5 6.5 6.5 0 109.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z" fill="currentColor"/></svg>
+                    <span class="art-search-hint">Ctrl+K</span>
+                </button>
+                <button class="art-theme-btn" id="themeToggle" title="切换主题">
+                    <svg class="art-icon art-icon-sun" viewBox="0 0 24 24"><path d="M12 7a5 5 0 100 10 5 5 0 000-10zm0-5a1 1 0 011 1v2a1 1 0 11-2 0V3a1 1 0 011-1zm0 18a1 1 0 011 1v2a1 1 0 11-2 0v-2a1 1 0 011-1zM4.22 4.22a1 1 0 011.42 0l1.41 1.41a1 1 0 11-1.41 1.42L4.22 5.64a1 1 0 010-1.42zm14.14 14.14a1 1 0 011.42 0l1.41 1.41a1 1 0 11-1.41 1.42l-1.42-1.41a1 1 0 010-1.42zM2 12a1 1 0 011-1h2a1 1 0 110 2H3a1 1 0 01-1-1zm18 0a1 1 0 011-1h2a1 1 0 110 2h-2a1 1 0 01-1-1zM5.64 18.36a1 1 0 010 1.42l-1.41 1.41a1 1 0 11-1.42-1.41l1.41-1.42a1 1 0 011.42 0zm12.72-12.72a1 1 0 010 1.42l-1.41 1.41a1 1 0 11-1.42-1.41l1.41-1.42a1 1 0 011.42 0z" fill="currentColor"/></svg>
+                    <svg class="art-icon art-icon-moon" viewBox="0 0 24 24"><path d="M12 3a9 9 0 109 9c0-.46-.04-.92-.1-1.36a5.389 5.389 0 01-4.4 2.26 5.403 5.403 0 01-3.14-9.8c-.44-.06-.9-.1-1.36-.1z" fill="currentColor"/></svg>
+                </button>
+                <button class="art-auth-btn" id="authBtn" title="认证设置">
+                    <svg class="art-icon" viewBox="0 0 24 24"><path d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zm-6 9c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm3.1-9H8.9V6c0-1.71 1.39-3.1 3.1-3.1 1.71 0 3.1 1.39 3.1 3.1v2z" fill="currentColor"/></svg>
+                </button>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <div class="art-main">
+            <!-- Sidebar -->
+            <aside class="art-sidebar" id="sidebar">
+                <div class="art-sidebar-search">
+                    <input type="text" id="sidebarSearch" placeholder="筛选接口..." class="art-sidebar-input">
+                </div>
+                <nav class="art-nav" id="apiNav">
+                    <!-- Dynamic API list -->
+                    <div class="art-nav-loading">
+                        <div class="art-spinner"></div>
+                        <span>加载中...</span>
+                    </div>
+                </nav>
+            </aside>
+
+            <!-- Content -->
+            <main class="art-content" id="content">
+                <div class="art-welcome" id="welcomePanel">
+                    <div class="art-welcome-icon">
+                        <svg viewBox="0 0 120 120" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <circle cx="60" cy="60" r="50" fill="var(--art-primary)" opacity="0.1"/>
+                            <path d="M60 20L30 35v50l30 15 30-15V35L60 20z" fill="var(--art-primary)" opacity="0.3"/>
+                            <path d="M60 20L30 35l30 15 30-15-30-15z" fill="var(--art-primary)"/>
+                            <path d="M30 35v50l30 15V50L30 35z" fill="var(--art-primary)" opacity="0.7"/>
+                            <path d="M90 35v50l-30 15V50l30-15z" fill="var(--art-primary)" opacity="0.5"/>
+                        </svg>
+                    </div>
+                    <h1 class="art-welcome-title">欢迎使用 ArtSwagger</h1>
+                    <p class="art-welcome-desc">请从左侧选择一个接口开始调试，或使用 <kbd>Ctrl</kbd>+<kbd>K</kbd> 快速搜索</p>
+                    <div class="art-welcome-stats" id="welcomeStats">
+                        <!-- Dynamic stats -->
+                    </div>
+                </div>
+
+                <!-- API Detail Panel -->
+                <div class="art-api-detail" id="apiDetail" style="display: none;">
+                    <!-- Dynamic content -->
+                </div>
+            </main>
+        </div>
+
+        <!-- Search Modal -->
+        <div class="art-modal art-search-modal" id="searchModal">
+            <div class="art-modal-backdrop" onclick="ArtSwagger.closeSearch()"></div>
+            <div class="art-search-dialog">
+                <div class="art-search-header">
+                    <svg class="art-icon" viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27A6.471 6.471 0 0016 9.5 6.5 6.5 0 109.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z" fill="currentColor"/></svg>
+                    <input type="text" id="globalSearchInput" placeholder="搜索接口..." autofocus>
+                    <kbd>ESC</kbd>
+                </div>
+                <div class="art-search-results" id="searchResults">
+                    <div class="art-search-empty">输入关键词搜索接口</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Auth Modal -->
+        <div class="art-modal art-auth-modal" id="authModal">
+            <div class="art-modal-backdrop" onclick="ArtSwagger.closeAuth()"></div>
+            <div class="art-auth-dialog">
+                <div class="art-dialog-header">
+                    <h3>认证设置</h3>
+                    <button class="art-dialog-close" onclick="ArtSwagger.closeAuth()">
+                        <svg class="art-icon" viewBox="0 0 24 24"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12 19 6.41z" fill="currentColor"/></svg>
+                    </button>
+                </div>
+                <div class="art-dialog-body">
+                    <div class="art-form-group">
+                        <label>Bearer Token</label>
+                        <div class="art-input-group">
+                            <input type="text" id="bearerToken" placeholder="输入 JWT Token...">
+                            <button class="art-btn art-btn-primary" onclick="ArtSwagger.applyAuth()">应用</button>
+                        </div>
+                    </div>
+                    <div class="art-form-hint">
+                        Token 将自动添加到所有请求的 Authorization 头中
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Toast Container -->
+        <div class="art-toast-container" id="toastContainer"></div>
+    </div>
+
+    <script>
+        // Configuration injected by server
+        window.ArtSwaggerConfig = {
+            urls: %(Urls),
+            primaryColor: '%(PrimaryColor)',
+            defaultTheme: '%(DefaultTheme)',
+            documentTitle: '%(DocumentTitle)',
+            enableSearch: %(EnableSearch),
+            enableCodeCopy: %(EnableCodeCopy)
+        };
+    </script>
+    <script src="./art-swagger.js?v=%(Version)"></script>
+</body>
+</html>

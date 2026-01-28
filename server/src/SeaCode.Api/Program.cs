@@ -16,6 +16,7 @@ using Serilog;
 using Serilog.Events;
 using Microsoft.EntityFrameworkCore.Diagnostics;
 using SeaCode.Infra.Cache;
+using ArtSwagger;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -113,6 +114,14 @@ services.AddSwaggerGen(options =>
     options.SwaggerDoc(ApiGroups.Game, new() { Title = "SeaCode 用户端 API", Version = "v1" });
     options.SwaggerDoc(ApiGroups.Common, new() { Title = "SeaCode 公共端 API", Version = "v1" });
     options.DocInclusionPredicate((docName, apiDesc) => apiDesc.GroupName == docName);
+
+    // 包含 XML 注释
+    var xmlFiles = Directory.GetFiles(AppContext.BaseDirectory, "*.xml", SearchOption.TopDirectoryOnly);
+    foreach (var xmlFile in xmlFiles)
+    {
+        options.IncludeXmlComments(xmlFile, includeControllerXmlComments: true);
+    }
+
     options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
     {
         Description = "JWT Authorization header using the Bearer scheme",
@@ -160,8 +169,14 @@ app.UseMiddleware<AuthorizationMiddleware>();
 if (!app.Environment.IsProduction())
 {
     app.UseSwagger();
-    app.UseSwaggerUI(options =>
+
+    // 使用 ArtSwagger UI（替代默认 SwaggerUI）
+    app.UseArtSwagger(options =>
     {
+        options.DocumentTitle = "SeaCode API 文档";
+        options.RoutePrefix = "swagger";
+        options.PrimaryColor = "#5D87FF";
+        options.DefaultTheme = ArtSwaggerTheme.Auto;
         options.SwaggerEndpoint($"/swagger/{ApiGroups.Admin}/swagger.json", "管理端");
         options.SwaggerEndpoint($"/swagger/{ApiGroups.Game}/swagger.json", "用户端");
         options.SwaggerEndpoint($"/swagger/{ApiGroups.Common}/swagger.json", "公共端");
