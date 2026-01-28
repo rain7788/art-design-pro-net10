@@ -621,7 +621,7 @@ a:hover {
 .art-nav-item {
     display: flex;
     align-items: center;
-    padding: 8px 16px 8px 42px;
+    padding: 10px 16px 10px 42px;
     cursor: pointer;
     transition: var(--art-transition-fast);
     gap: 8px;
