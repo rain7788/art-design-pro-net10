@@ -36,6 +36,14 @@
                     <span>加载中...</span>
                 </div>
             </nav>
+            <!-- Sidebar Footer -->
+            <div class="art-sidebar-footer">
+                <button class="art-sidebar-action" id="globalParamsBtn" title="全局参数设置">
+                    <svg class="art-icon" viewBox="0 0 24 24"><path d="M19.14 12.94c.04-.31.06-.63.06-.94 0-.31-.02-.63-.06-.94l2.03-1.58c.18-.14.23-.41.12-.61l-1.92-3.32c-.12-.22-.37-.29-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54c-.04-.24-.24-.41-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96c-.22-.08-.47 0-.59.22L2.74 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.04.31-.06.63-.06.94s.02.63.06.94l-2.03 1.58c-.18.14-.23.41-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.01-1.58zM12 15.6c-1.98 0-3.6-1.62-3.6-3.6s1.62-3.6 3.6-3.6 3.6 1.62 3.6 3.6-1.62 3.6-3.6 3.6z" fill="currentColor"/></svg>
+                    <span>全局参数</span>
+                    <span class="art-params-count" id="globalParamsCount" style="display: none;">0</span>
+                </button>
+            </div>
         </aside>
 
         <!-- Main Area -->
@@ -134,6 +142,67 @@
                     <div class="art-form-hint">
                         Token 将自动添加到所有请求的 Authorization 头中
                     </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Global Params Modal -->
+        <div class="art-modal art-params-modal" id="globalParamsModal">
+            <div class="art-modal-backdrop" onclick="ArtSwagger.closeGlobalParams()"></div>
+            <div class="art-params-dialog">
+                <div class="art-dialog-header">
+                    <h3>全局参数设置</h3>
+                    <button class="art-dialog-close" onclick="ArtSwagger.closeGlobalParams()">
+                        <svg class="art-icon" viewBox="0 0 24 24"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12 19 6.41z" fill="currentColor"/></svg>
+                    </button>
+                </div>
+                <div class="art-dialog-body">
+                    <div class="art-params-hint">
+                        在此添加全局参数，调试时会自动带上这些参数（可在调试页面临时修改）
+                    </div>
+                    <div class="art-params-actions">
+                        <button class="art-btn art-btn-primary" onclick="ArtSwagger.showAddParam()">
+                            <svg class="art-icon" viewBox="0 0 24 24"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z" fill="currentColor"/></svg>
+                            添加参数
+                        </button>
+                    </div>
+                    <div class="art-params-list" id="globalParamsList">
+                        <!-- Dynamic params list -->
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Add/Edit Param Modal -->
+        <div class="art-modal art-param-form-modal" id="paramFormModal">
+            <div class="art-modal-backdrop" onclick="ArtSwagger.closeParamForm()"></div>
+            <div class="art-param-form-dialog">
+                <div class="art-dialog-header">
+                    <h3 id="paramFormTitle">新增参数</h3>
+                    <button class="art-dialog-close" onclick="ArtSwagger.closeParamForm()">
+                        <svg class="art-icon" viewBox="0 0 24 24"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12 19 6.41z" fill="currentColor"/></svg>
+                    </button>
+                </div>
+                <div class="art-dialog-body">
+                    <div class="art-form-group">
+                        <label><span class="art-required">*</span> 参数名称</label>
+                        <input type="text" id="paramName" class="art-input" placeholder="请输入参数名称">
+                    </div>
+                    <div class="art-form-group">
+                        <label><span class="art-required">*</span> 参数值</label>
+                        <input type="text" id="paramValue" class="art-input" placeholder="请输入参数值">
+                    </div>
+                    <div class="art-form-group">
+                        <label><span class="art-required">*</span> 参数类型</label>
+                        <select id="paramType" class="art-input art-select">
+                            <option value="header">header</option>
+                            <option value="query">query</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="art-dialog-footer">
+                    <button class="art-btn art-btn-secondary" onclick="ArtSwagger.closeParamForm()">取 消</button>
+                    <button class="art-btn art-btn-primary" onclick="ArtSwagger.saveParam()">确 定</button>
                 </div>
             </div>
         </div>

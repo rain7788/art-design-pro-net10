@@ -54,6 +54,7 @@
         initEventListeners();
         loadGroups();
         restoreAuth();
+        loadGlobalParams();
     }
 
     function cacheElements() {
@@ -132,6 +133,9 @@
 
         // Auth
         elements.authBtn.addEventListener('click', () => openAuth());
+
+        // Global Params
+        document.getElementById('globalParamsBtn')?.addEventListener('click', () => openGlobalParams());
 
         // Sidebar filter
         elements.sidebarSearch.addEventListener('input', debounce(filterSidebar, 200));
@@ -640,14 +644,16 @@
             <div class="art-api-header">
                 <span class="art-api-method ${op.method}">${op.method.toUpperCase()}</span>
                 <div class="art-api-info">
-                    <div class="art-api-path">${escapeHtml(op.path)}</div>
-                    ${op.summary ? `<div class="art-api-summary">${escapeHtml(op.summary)}</div>` : ''}
-                    <div class="art-api-tags">
-                        ${op.tags.map(t => `<span class="art-api-tag">${escapeHtml(t)}</span>`).join('')}
-                        ${op.deprecated ? '<span class="art-deprecated-badge">已废弃</span>' : ''}
+                    <div class="art-api-path-row">
+                        <span class="art-api-path">${escapeHtml(op.path)}</span>
+                        ${op.summary ? `<span class="art-api-summary">${escapeHtml(op.summary)}</span>` : ''}
                     </div>
                 </div>
                 <div class="art-api-actions">
+                    <span class="art-api-tags">
+                        ${op.tags.map(t => `<span class="art-api-tag">${escapeHtml(t)}</span>`).join('')}
+                        ${op.deprecated ? '<span class="art-deprecated-badge">已废弃</span>' : ''}
+                    </span>
                     <button class="art-btn art-btn-secondary art-btn-icon" onclick="ArtSwagger.copyAsCurl()" title="复制 cURL">
                         <svg class="art-icon" viewBox="0 0 24 24"><path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z" fill="currentColor"/></svg>
                     </button>
@@ -803,6 +809,9 @@
 
             <!-- Debug Tab Content -->
             <div class="art-main-tab-content" id="tabDebug">
+                <!-- Global Params (if any) -->
+                ${renderGlobalParamsForDebug()}
+
                 <!-- Parameters Input -->
                 ${parameters.length > 0 ? `
                 <div class="art-card">
@@ -1309,6 +1318,35 @@
             headers['Authorization'] = `Bearer ${state.bearerToken}`;
         }
 
+        // Add global params (from inputs in debug panel if available, else from stored values)
+        // Only if global params are enabled
+        if (globalParamsEnabled) {
+            const globalInputs = panel ? panel.querySelectorAll('[data-global-param]') : [];
+            if (globalInputs.length > 0) {
+                globalInputs.forEach(input => {
+                    const name = input.dataset.paramName;
+                    const type = input.dataset.paramType;
+                    const value = input.value.trim();
+                    if (!value) return;
+
+                    if (type === 'header') {
+                        headers[name] = value;
+                    } else if (type === 'query') {
+                        url.searchParams.set(name, value);
+                    }
+                });
+            } else {
+                // Fallback to stored global params
+                globalParams.forEach(p => {
+                    if (p.type === 'header') {
+                        headers[p.name] = p.value;
+                    } else if (p.type === 'query') {
+                        url.searchParams.set(p.name, p.value);
+                    }
+                });
+            }
+        }
+
         // Collect parameter values from inputs within the panel
         const paramInputs = panel ? panel.querySelectorAll('[data-param]') : document.querySelectorAll('[data-param]');
         paramInputs.forEach(input => {
@@ -1471,6 +1509,227 @@
     }
 
     // ============================================
+    // Global Params
+    // ============================================
+    let globalParams = [];
+    let editingParamIndex = -1;
+
+    function loadGlobalParams() {
+        const saved = localStorage.getItem('art-swagger-global-params');
+        globalParams = saved ? JSON.parse(saved) : [];
+        updateGlobalParamsCount();
+    }
+
+    function saveGlobalParams() {
+        localStorage.setItem('art-swagger-global-params', JSON.stringify(globalParams));
+        updateGlobalParamsCount();
+    }
+
+    function updateGlobalParamsCount() {
+        const countEl = document.getElementById('globalParamsCount');
+        if (countEl) {
+            const count = globalParams.length;
+            countEl.textContent = count;
+            countEl.style.display = count > 0 ? 'inline' : 'none';
+        }
+    }
+
+    function openGlobalParams() {
+        const modal = document.getElementById('globalParamsModal');
+        modal.classList.add('open');
+        renderGlobalParamsList();
+    }
+
+    function closeGlobalParams() {
+        document.getElementById('globalParamsModal').classList.remove('open');
+    }
+
+    function renderGlobalParamsList() {
+        const listEl = document.getElementById('globalParamsList');
+        if (globalParams.length === 0) {
+            listEl.innerHTML = '<div class="art-params-empty">暂无全局参数，点击上方按钮添加</div>';
+            return;
+        }
+
+        listEl.innerHTML = `
+            <table class="art-params-table">
+                <thead>
+                    <tr>
+                        <th style="width: 30%;">参数名</th>
+                        <th style="width: 35%;">参数值</th>
+                        <th style="width: 15%;">类型</th>
+                        <th style="width: 20%;">操作</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    ${globalParams.map((p, i) => `
+                        <tr>
+                            <td><span class="art-param-name">${escapeHtml(p.name)}</span></td>
+                            <td><span class="art-param-value" title="${escapeHtml(p.value)}">${escapeHtml(p.value)}</span></td>
+                            <td><span class="art-param-type ${p.type}">${p.type}</span></td>
+                            <td>
+                                <div class="art-param-actions">
+                                    <button onclick="ArtSwagger.editParam(${i})" title="编辑">
+                                        <svg class="art-icon" viewBox="0 0 24 24"><path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z" fill="currentColor"/></svg>
+                                    </button>
+                                    <button class="delete" onclick="ArtSwagger.deleteParam(${i})" title="删除">
+                                        <svg class="art-icon" viewBox="0 0 24 24"><path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z" fill="currentColor"/></svg>
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+                    `).join('')}
+                </tbody>
+            </table>
+        `;
+    }
+
+    function showAddParam() {
+        editingParamIndex = -1;
+        document.getElementById('paramFormTitle').textContent = '新增参数';
+        document.getElementById('paramName').value = '';
+        document.getElementById('paramValue').value = '';
+        document.getElementById('paramType').value = 'header';
+        document.getElementById('paramFormModal').classList.add('open');
+        document.getElementById('paramName').focus();
+    }
+
+    function editParam(index) {
+        editingParamIndex = index;
+        const param = globalParams[index];
+        document.getElementById('paramFormTitle').textContent = '编辑参数';
+        document.getElementById('paramName').value = param.name;
+        document.getElementById('paramValue').value = param.value;
+        document.getElementById('paramType').value = param.type;
+        document.getElementById('paramFormModal').classList.add('open');
+        document.getElementById('paramName').focus();
+    }
+
+    function deleteParam(index) {
+        globalParams.splice(index, 1);
+        saveGlobalParams();
+        renderGlobalParamsList();
+        showToast('参数已删除', 'success');
+    }
+
+    function closeParamForm() {
+        document.getElementById('paramFormModal').classList.remove('open');
+    }
+
+    function saveParam() {
+        const name = document.getElementById('paramName').value.trim();
+        const value = document.getElementById('paramValue').value.trim();
+        const type = document.getElementById('paramType').value;
+
+        if (!name) {
+            showToast('请输入参数名称', 'warning');
+            document.getElementById('paramName').focus();
+            return;
+        }
+        if (!value) {
+            showToast('请输入参数值', 'warning');
+            document.getElementById('paramValue').focus();
+            return;
+        }
+
+        const param = { name, value, type };
+
+        if (editingParamIndex >= 0) {
+            globalParams[editingParamIndex] = param;
+            showToast('参数已更新', 'success');
+        } else {
+            // Check for duplicate
+            const exists = globalParams.some(p => p.name === name && p.type === type);
+            if (exists) {
+                showToast('该参数已存在', 'warning');
+                return;
+            }
+            globalParams.push(param);
+            showToast('参数已添加', 'success');
+        }
+
+        saveGlobalParams();
+        closeParamForm();
+        renderGlobalParamsList();
+    }
+
+    function getGlobalParams() {
+        return globalParams;
+    }
+
+    // 全局参数启用状态
+    let globalParamsEnabled = true;
+
+    function renderGlobalParamsForDebug() {
+        if (globalParams.length === 0) return '';
+
+        const checkboxClass = globalParamsEnabled ? 'art-global-params-checkbox checked' : 'art-global-params-checkbox';
+
+        return `
+            <div class="art-global-params-section" id="globalParamsSection">
+                <div class="art-global-params-header" onclick="window.ArtSwagger.toggleGlobalParamsSection(event)">
+                    <svg class="art-icon art-global-params-toggle" viewBox="0 0 24 24"><path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z" fill="currentColor"/></svg>
+                    <div class="${checkboxClass}" onclick="window.ArtSwagger.toggleGlobalParamsEnabled(event)">
+                        <svg class="art-icon" viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z" fill="currentColor"/></svg>
+                    </div>
+                    <span class="art-global-params-title">全局参数（可临时修改）</span>
+                    <span class="art-global-params-badge">${globalParams.length}</span>
+                </div>
+                <div class="art-global-params-table">
+                    <table class="art-params-table">
+                        <thead>
+                            <tr>
+                                <th style="width: 25%;">参数名</th>
+                                <th style="width: 15%;">类型</th>
+                                <th style="width: 60%;">值</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${globalParams.map((p, i) => `
+                                <tr>
+                                    <td><code class="art-param-name">${escapeHtml(p.name)}</code></td>
+                                    <td><span class="art-param-type ${p.type}">${p.type}</span></td>
+                                    <td>
+                                        <input type="text" class="art-global-input" 
+                                               data-global-param="${i}"
+                                               data-param-name="${escapeHtml(p.name)}"
+                                               data-param-type="${p.type}"
+                                               value="${escapeHtml(p.value)}">
+                                    </td>
+                                </tr>
+                            `).join('')}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        `;
+    }
+
+    function toggleGlobalParamsSection(e) {
+        // 如果点击的是 checkbox 区域，不展开/折叠
+        if (e.target.closest('.art-global-params-checkbox')) return;
+
+        const section = document.getElementById('globalParamsSection');
+        if (section) {
+            section.classList.toggle('expanded');
+        }
+    }
+
+    function toggleGlobalParamsEnabled(e) {
+        e.stopPropagation();
+        globalParamsEnabled = !globalParamsEnabled;
+
+        const checkbox = e.target.closest('.art-global-params-checkbox');
+        if (checkbox) {
+            checkbox.classList.toggle('checked', globalParamsEnabled);
+        }
+    }
+
+    function isGlobalParamsEnabled() {
+        return globalParamsEnabled;
+    }
+
+    // ============================================
     // Copy Functions
     // ============================================
     function copyAsCurl() {
@@ -1585,6 +1844,17 @@
         closeAuth,
         applyAuth,
 
+        // Global Params
+        openGlobalParams,
+        closeGlobalParams,
+        showAddParam,
+        editParam,
+        deleteParam,
+        closeParamForm,
+        saveParam,
+        toggleGlobalParamsSection,
+        toggleGlobalParamsEnabled,
+
         // Request
         executeRequest,
         clearInputs,
@@ -1599,7 +1869,9 @@
         showToast,
 
         // State (for debugging)
-        getState: () => state
+        getState: () => state,
+        getGlobalParams,
+        isGlobalParamsEnabled
     };
 
     // Auto-init on DOM ready
