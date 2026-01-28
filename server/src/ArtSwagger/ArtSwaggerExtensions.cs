@@ -41,6 +41,18 @@ public static class ArtSwaggerExtensions
         var routePrefix = options.RoutePrefix.Trim('/');
         var fileProvider = new EmbeddedFileProvider(ThisAssembly, EmbeddedFileNamespace);
 
+        // Redirect /swagger to /swagger/ (ensure trailing slash for relative paths)
+        app.Use(async (context, next) =>
+        {
+            var path = context.Request.Path.Value ?? string.Empty;
+            if (path.Equals($"/{routePrefix}", StringComparison.OrdinalIgnoreCase) && !path.EndsWith('/'))
+            {
+                context.Response.Redirect($"/{routePrefix}/", permanent: true);
+                return;
+            }
+            await next();
+        });
+
         // Serve index.html at route prefix
         app.Map($"/{routePrefix}", subApp =>
         {
