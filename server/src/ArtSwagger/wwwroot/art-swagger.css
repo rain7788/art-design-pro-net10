@@ -1352,60 +1352,49 @@ a:hover {
    Main Tabs (Document vs Debug)
    ============================================ */
 .art-main-tabs {
-    display: flex;
-    gap: 0;
+    display: inline-flex;
+    gap: 4px;
     margin-bottom: 20px;
-    background: var(--art-bg-card);
-    border: 1px solid var(--art-border-color);
-    border-radius: var(--art-border-radius-lg);
-    overflow: hidden;
-    box-shadow: var(--art-shadow-sm);
+    padding: 4px;
+    background: var(--art-gray-100);
+    border-radius: var(--art-border-radius);
+    box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.06);
+}
+
+.dark .art-main-tabs {
+    background: var(--art-gray-200);
 }
 
 .art-main-tab {
-    flex: 1;
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 8px;
-    padding: 14px 24px;
-    background: var(--art-bg-card);
+    gap: 6px;
+    padding: 8px 20px;
+    background: transparent;
     border: none;
-    border-right: 1px solid var(--art-border-color);
+    border-radius: var(--art-border-radius-sm);
     color: var(--art-text-secondary);
-    font-size: 14px;
+    font-size: 13px;
     font-weight: 500;
     cursor: pointer;
     transition: var(--art-transition);
     position: relative;
 }
 
-.art-main-tab:last-child {
-    border-right: none;
-}
-
 .art-main-tab:hover {
     color: var(--art-text-primary);
-    background: var(--art-bg-hover);
 }
 
 .art-main-tab.active {
     color: var(--art-primary);
-    background: var(--art-primary-bg);
-}
-
-.art-main-tab.active::after {
-    content: '';
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    height: 3px;
-    background: var(--art-primary);
-    border-radius: 3px 3px 0 0;
+    background: var(--art-bg-card);
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
 }
 
 .art-main-tab .art-icon {
+    width: 14px;
+    height: 14px;
     color: inherit;
 }
 
