@@ -169,3 +169,4 @@ Thumbs.db
 # IDE
 *.sublime-workspace
 *.sublime-project
+.playwright-mcp

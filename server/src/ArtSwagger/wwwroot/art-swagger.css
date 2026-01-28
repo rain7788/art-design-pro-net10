@@ -680,7 +680,7 @@ a:hover {
    API Detail Panel
    ============================================ */
 .art-api-detail {
-    max-width: 1200px;
+    width: 100%;
 }
 
 .art-api-header {

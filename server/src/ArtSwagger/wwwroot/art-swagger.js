@@ -560,11 +560,11 @@
                         <table class="art-params-table art-doc-table">
                             <thead>
                                 <tr>
-                                    <th style="width: 180px;">参数名</th>
-                                    <th style="width: 80px;">位置</th>
-                                    <th style="width: 120px;">类型</th>
-                                    <th style="width: 60px;">必填</th>
-                                    <th>说明</th>
+                                    <th style="width: 20%;">参数名</th>
+                                    <th style="width: 10%;">位置</th>
+                                    <th style="width: 15%;">类型</th>
+                                    <th style="width: 8%;">必填</th>
+                                    <th style="width: 47%;">说明</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -603,10 +603,10 @@
                         <table class="art-params-table art-doc-table">
                             <thead>
                                 <tr>
-                                    <th style="width: 200px;">字段名</th>
-                                    <th style="width: 120px;">类型</th>
-                                    <th style="width: 60px;">必填</th>
-                                    <th>说明</th>
+                                    <th style="width: 25%;">字段名</th>
+                                    <th style="width: 18%;">类型</th>
+                                    <th style="width: 10%;">必填</th>
+                                    <th style="width: 47%;">说明</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -647,10 +647,10 @@
                                 <table class="art-params-table art-doc-table art-nested-table">
                                     <thead>
                                         <tr>
-                                            <th style="width: 200px;">字段名</th>
-                                            <th style="width: 120px;">类型</th>
-                                            <th style="width: 60px;">可空</th>
-                                            <th>说明</th>
+                                            <th style="width: 25%;">字段名</th>
+                                            <th style="width: 18%;">类型</th>
+                                            <th style="width: 10%;">可空</th>
+                                            <th style="width: 47%;">说明</th>
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -681,11 +681,11 @@
                         <table class="art-params-table">
                             <thead>
                                 <tr>
-                                    <th style="width: 160px;">参数名</th>
-                                    <th style="width: 70px;">位置</th>
-                                    <th style="width: 90px;">类型</th>
-                                    <th style="width: 50px;">必填</th>
-                                    <th style="width: 200px;">值</th>
+                                    <th style="width: 20%;">参数名</th>
+                                    <th style="width: 10%;">位置</th>
+                                    <th style="width: 15%;">类型</th>
+                                    <th style="width: 8%;">必填</th>
+                                    <th style="width: 47%;">值</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -739,8 +739,8 @@
                         发送请求
                     </button>
                     <button class="art-btn art-btn-secondary" onclick="ArtSwagger.clearInputs()">
-                        <svg class="art-icon" viewBox="0 0 24 24" style="width: 16px; height: 16px;"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12 19 6.41z" fill="currentColor"/></svg>
-                        清空
+                        <svg class="art-icon" viewBox="0 0 24 24" style="width: 16px; height: 16px;"><path d="M12 5V1L7 6l5 5V7c3.31 0 6 2.69 6 6s-2.69 6-6 6-6-2.69-6-6H4c0 4.42 3.58 8 8 8s8-3.58 8-8-3.58-8-8-8z" fill="currentColor"/></svg>
+                        重置
                     </button>
                 </div>
 
@@ -1170,14 +1170,24 @@
     }
 
     function clearInputs() {
-        document.querySelectorAll('#apiDetail .art-input').forEach(input => {
+        // 重置参数输入框为默认值（placeholder 或空）
+        document.querySelectorAll('#apiDetail .art-param-input').forEach(input => {
             input.value = '';
         });
+
+        // 重置请求体为默认示例
+        const requestBodyInput = document.getElementById('requestBodyInput');
+        if (requestBodyInput && state.currentOperation) {
+            const requestBody = resolveRequestBody(state.currentOperation);
+            requestBodyInput.value = requestBody?.example || '';
+        }
 
         const responseCard = document.getElementById('responseCard');
         if (responseCard) {
             responseCard.style.display = 'none';
         }
+
+        showToast('已重置为默认值', 'info');
     }
 
     function formatRequestBody() {
