@@ -516,13 +516,13 @@ a:hover {
 
 /* Nav Tags (Groups) */
 .art-nav-tag {
-    margin-bottom: 4px;
+    margin-bottom: 2px;
 }
 
 .art-nav-tag-header {
     display: flex;
     align-items: center;
-    padding: 8px 16px;
+    padding: 10px 16px;
     cursor: pointer;
     user-select: none;
     transition: var(--art-transition-fast);
@@ -535,7 +535,7 @@ a:hover {
 .art-nav-tag-icon {
     width: 16px;
     height: 16px;
-    margin-right: 8px;
+    margin-right: 10px;
     color: var(--art-text-secondary);
     transition: var(--art-transition-fast);
 }
@@ -546,16 +546,21 @@ a:hover {
 
 .art-nav-tag-name {
     flex: 1;
-    font-weight: 500;
+    font-weight: 400;
     color: var(--art-text-primary);
-    font-size: 13px;
+    font-size: 14px;
+}
+
+.art-nav-tag-header:hover .art-nav-tag-name {
+    color: var(--art-primary);
 }
 
 .art-nav-tag-count {
     padding: 2px 8px;
-    background: var(--art-gray-200);
+    background: var(--art-bg-hover);
     border-radius: 10px;
-    font-size: 11px;
+    font-size: 12px;
+    font-weight: 400;
     color: var(--art-text-secondary);
 }
 
@@ -576,7 +581,7 @@ a:hover {
 .art-nav-item {
     display: flex;
     align-items: center;
-    padding: 8px 16px 8px 40px;
+    padding: 8px 16px 8px 42px;
     cursor: pointer;
     transition: var(--art-transition-fast);
     gap: 8px;
@@ -643,11 +648,15 @@ a:hover {
 
 .art-nav-item-path {
     flex: 1;
-    font-size: 12px;
+    font-size: 13px;
     color: var(--art-text-regular);
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
+}
+
+.art-nav-item:hover .art-nav-item-path {
+    color: var(--art-primary);
 }
 
 /* ============================================
