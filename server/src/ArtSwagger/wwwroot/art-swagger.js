@@ -52,6 +52,7 @@
     function init() {
         cacheElements();
         initTheme();
+        initSidebarState();
         initEventListeners();
         initHashListener();
         loadGroups();
@@ -110,6 +111,31 @@
     }
 
     // ============================================
+    // Sidebar Toggle
+    // ============================================
+    function toggleSidebar() {
+        elements.sidebar.classList.toggle('collapsed');
+        // Save state
+        localStorage.setItem('art-swagger-sidebar', elements.sidebar.classList.contains('collapsed') ? 'collapsed' : 'expanded');
+    }
+
+    function initSidebarState() {
+        const savedState = localStorage.getItem('art-swagger-sidebar');
+        if (savedState === 'collapsed') {
+            elements.sidebar.classList.add('collapsed');
+        }
+    }
+
+    // ============================================
+    // Refresh Current Group
+    // ============================================
+    function refreshCurrentGroup() {
+        if (state.currentGroup) {
+            selectGroup(state.currentGroup.url, state.currentGroup.name);
+        }
+    }
+
+    // ============================================
     // Event Listeners
     // ============================================
     function initEventListeners() {
@@ -128,6 +154,12 @@
 
         // Search
         elements.searchBtn.addEventListener('click', () => openSearch());
+
+        // Sidebar toggle
+        document.getElementById('sidebarToggle')?.addEventListener('click', toggleSidebar);
+
+        // Refresh button
+        document.getElementById('refreshBtn')?.addEventListener('click', refreshCurrentGroup);
 
         // Global Params (both sidebar and header buttons)
         document.getElementById('globalParamsBtn')?.addEventListener('click', () => openGlobalParams());

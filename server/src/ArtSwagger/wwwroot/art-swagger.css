@@ -197,7 +197,7 @@ a:hover {
 .art-header-left {
     display: flex;
     align-items: center;
-    gap: 12px;
+    gap: 2px;
 }
 
 .art-header-title {
@@ -327,17 +327,17 @@ a:hover {
 
 /* Header Buttons */
 .art-icon {
-    width: 18px;
-    height: 18px;
+    width: 20px;
+    height: 20px;
     flex-shrink: 0;
 }
 
 .art-icon-btn {
-    display: flex;
+    display: inline-flex;
     align-items: center;
     justify-content: center;
-    width: 32px;
-    height: 32px;
+    width: 34px;
+    height: 34px;
     background: transparent;
     border: none;
     border-radius: 6px;
@@ -347,7 +347,7 @@ a:hover {
 }
 
 .art-icon-btn:hover {
-    background: var(--art-gray-100);
+    background: var(--art-bg-hover);
     color: var(--art-text-primary);
 }
 
@@ -420,6 +420,16 @@ a:hover {
     flex-direction: column;
     flex-shrink: 0;
     overflow: hidden;
+    transition: width 0.3s ease, margin 0.3s ease;
+}
+
+.art-sidebar.collapsed {
+    width: 0;
+    border-right: none;
+}
+
+.art-sidebar.collapsed * {
+    visibility: hidden;
 }
 
 .art-sidebar-header {
@@ -1743,8 +1753,7 @@ a:hover {
 .art-modal-backdrop {
     position: absolute;
     inset: 0;
-    background: rgba(0, 0, 0, 0.5);
-    backdrop-filter: blur(4px);
+    background: rgba(0, 0, 0, 0.35);
 }
 
 /* Search Modal */
@@ -1755,14 +1764,20 @@ a:hover {
     background: var(--art-bg-card);
     border: 1px solid var(--art-border-color);
     border-radius: var(--art-border-radius-lg);
-    box-shadow: var(--art-shadow-lg);
+    box-shadow: 0 4px 24px rgba(0, 0, 0, 0.12);
     overflow: hidden;
-    transform: translateY(-20px);
-    transition: var(--art-transition);
+    transform: translateY(-20px) scale(0.98);
+    opacity: 0;
+    transition: transform 0.2s ease, opacity 0.2s ease;
+}
+
+.dark .art-search-dialog {
+    box-shadow: 0 4px 24px rgba(0, 0, 0, 0.3);
 }
 
 .art-modal.open .art-search-dialog {
-    transform: translateY(0);
+    transform: translateY(0) scale(1);
+    opacity: 1;
 }
 
 .art-search-header {
