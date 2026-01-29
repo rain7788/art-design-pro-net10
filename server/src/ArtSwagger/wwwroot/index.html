@@ -48,13 +48,10 @@
 
         <!-- Main Area -->
         <div class="art-main-area">
-            <!-- Top Header with Tabs -->
+            <!-- Top Header (Layer 1) -->
             <header class="art-header">
                 <div class="art-header-left">
-                    <!-- Tabs Container -->
-                    <div class="art-tabs-bar" id="tabsBar">
-                        <!-- Dynamic tabs will be inserted here -->
-                    </div>
+                    <span class="art-header-title">接口文档</span>
                 </div>
                 <div class="art-header-right">
                     <div class="art-group-selector" id="groupSelector">
@@ -68,14 +65,25 @@
                     </div>
                     <button class="art-search-btn" id="searchBtn" title="搜索 (Ctrl+K)">
                         <svg class="art-icon" viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27A6.471 6.471 0 0016 9.5 6.5 6.5 0 109.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z" fill="currentColor"/></svg>
-                        <span class="art-search-hint">Ctrl+K</span>
+                        <span class="art-search-text">搜索</span>
+                        <span class="art-search-hint">⌘K</span>
                     </button>
-                    <button class="art-theme-btn" id="themeToggle" title="切换主题">
+                    <button class="art-icon-btn" id="globalParamsBtnHeader" title="全局参数">
+                        <svg class="art-icon" viewBox="0 0 24 24"><path d="M19.14 12.94c.04-.31.06-.63.06-.94 0-.31-.02-.63-.06-.94l2.03-1.58c.18-.14.23-.41.12-.61l-1.92-3.32c-.12-.22-.37-.29-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54c-.04-.24-.24-.41-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96c-.22-.08-.47 0-.59.22L2.74 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.04.31-.06.63-.06.94s.02.63.06.94l-2.03 1.58c-.18.14-.23.41-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.01-1.58zM12 15.6c-1.98 0-3.6-1.62-3.6-3.6s1.62-3.6 3.6-3.6 3.6 1.62 3.6 3.6-1.62 3.6-3.6 3.6z" fill="currentColor"/></svg>
+                    </button>
+                    <button class="art-icon-btn" id="themeToggle" title="切换主题">
                         <svg class="art-icon art-icon-sun" viewBox="0 0 24 24"><path d="M12 7a5 5 0 100 10 5 5 0 000-10zm0-5a1 1 0 011 1v2a1 1 0 11-2 0V3a1 1 0 011-1zm0 18a1 1 0 011 1v2a1 1 0 11-2 0v-2a1 1 0 011-1zM4.22 4.22a1 1 0 011.42 0l1.41 1.41a1 1 0 11-1.41 1.42L4.22 5.64a1 1 0 010-1.42zm14.14 14.14a1 1 0 011.42 0l1.41 1.41a1 1 0 11-1.41 1.42l-1.42-1.41a1 1 0 010-1.42zM2 12a1 1 0 011-1h2a1 1 0 110 2H3a1 1 0 01-1-1zm18 0a1 1 0 011-1h2a1 1 0 110 2h-2a1 1 0 01-1-1zM5.64 18.36a1 1 0 010 1.42l-1.41 1.41a1 1 0 11-1.42-1.41l1.41-1.42a1 1 0 011.42 0zm12.72-12.72a1 1 0 010 1.42l-1.41 1.41a1 1 0 11-1.42-1.41l1.41-1.42a1 1 0 011.42 0z" fill="currentColor"/></svg>
                         <svg class="art-icon art-icon-moon" viewBox="0 0 24 24"><path d="M12 3a9 9 0 109 9c0-.46-.04-.92-.1-1.36a5.389 5.389 0 01-4.4 2.26 5.403 5.403 0 01-3.14-9.8c-.44-.06-.9-.1-1.36-.1z" fill="currentColor"/></svg>
                     </button>
                 </div>
             </header>
+
+            <!-- Tabs Bar (Layer 2) -->
+            <div class="art-tabs-bar-wrapper">
+                <div class="art-tabs-bar" id="tabsBar">
+                    <!-- Dynamic tabs will be inserted here -->
+                </div>
+            </div>
 
             <!-- Content Area -->
             <main class="art-content" id="content">

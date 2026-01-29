@@ -128,8 +128,9 @@
         // Search
         elements.searchBtn.addEventListener('click', () => openSearch());
 
-        // Global Params
+        // Global Params (both sidebar and header buttons)
         document.getElementById('globalParamsBtn')?.addEventListener('click', () => openGlobalParams());
+        document.getElementById('globalParamsBtnHeader')?.addEventListener('click', () => openGlobalParams());
 
         // Sidebar filter
         elements.sidebarSearch.addEventListener('input', debounce(filterSidebar, 200));
@@ -474,7 +475,7 @@
         state.currentOperation = null;
         state.openTabs = [];
         state.activeTabId = null;
-        elements.tabsBar.innerHTML = '';
+        renderTabs(); // 保留概览标签
 
         // Remove active state from nav items
         elements.apiNav.querySelectorAll('.art-nav-item').forEach(item => {
@@ -606,7 +607,17 @@
     }
 
     function renderTabs() {
-        elements.tabsBar.innerHTML = state.openTabs.map(tab => `
+        // 固定的概览标签
+        const homeTab = `
+            <div class="art-tab-item fixed ${!state.activeTabId ? 'active' : ''}" 
+                 data-tab-id="home" 
+                 onclick="ArtSwagger.showWelcome()">
+                <svg viewBox="0 0 24 24" width="14" height="14" style="flex-shrink:0"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z" fill="currentColor"/></svg>
+                <span class="art-tab-title">概览</span>
+            </div>
+        `;
+
+        const apiTabs = state.openTabs.map(tab => `
             <div class="art-tab-item ${tab.id === state.activeTabId ? 'active' : ''}" 
                  data-tab-id="${tab.id}" 
                  onclick="ArtSwagger.activateTab('${tab.id}')">
@@ -617,6 +628,8 @@
                 </span>
             </div>
         `).join('');
+
+        elements.tabsBar.innerHTML = homeTab + apiTabs;
     }
 
     function updateNavActiveState(path, method) {
@@ -1867,6 +1880,7 @@
         openTab,
         closeTab,
         activateTab,
+        showWelcome,
 
         // Search
         openSearch,

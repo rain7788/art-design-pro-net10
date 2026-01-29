@@ -180,16 +180,16 @@ a:hover {
 }
 
 /* ============================================
-   Header (Top bar in main area)
+   Header (Top bar in main area) - Layer 1
    ============================================ */
 .art-header {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    height: var(--art-header-height);
-    padding: 0 20px;
-    background: var(--art-bg-card);
-    border-bottom: 1px solid var(--art-border-color);
+    height: 50px;
+    padding: 0 16px;
+    background: var(--art-bg-page);
+    border-bottom: none;
     flex-shrink: 0;
     z-index: 100;
 }
@@ -198,18 +198,18 @@ a:hover {
     display: flex;
     align-items: center;
     gap: 12px;
-    flex: 1;
-    min-width: 0;
-    overflow: hidden;
+}
+
+.art-header-title {
+    font-size: 15px;
+    font-weight: 500;
+    color: var(--art-text-primary);
 }
 
 .art-header-right {
     display: flex;
     align-items: center;
-    gap: 12px;
-    flex-shrink: 0;
-    margin-left: 16px;
-}
+    gap: 8px;
 }
 
 .art-logo {
@@ -310,46 +310,69 @@ a:hover {
 
 /* Header Buttons */
 .art-icon {
-    width: 20px;
-    height: 20px;
+    width: 18px;
+    height: 18px;
     flex-shrink: 0;
 }
 
-.art-search-btn,
-.art-theme-btn {
+.art-icon-btn {
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 6px;
-    width: 36px;
-    height: 36px;
+    width: 32px;
+    height: 32px;
     background: transparent;
-    border: 1px solid transparent;
-    border-radius: var(--art-border-radius);
-    color: var(--art-text-regular);
+    border: none;
+    border-radius: 6px;
+    color: var(--art-text-secondary);
     cursor: pointer;
     transition: var(--art-transition);
 }
 
-.art-search-btn {
-    width: auto;
-    padding: 0 12px;
-    border-color: var(--art-border-color);
-    background: var(--art-bg-input);
+.art-icon-btn:hover {
+    background: var(--art-gray-100);
+    color: var(--art-text-primary);
 }
 
-.art-search-btn:hover,
-.art-theme-btn:hover {
-    background: var(--art-bg-hover);
-    color: var(--art-primary);
+.dark .art-icon-btn:hover {
+    background: var(--art-gray-300);
+}
+
+.art-search-btn {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    height: 32px;
+    min-width: 160px;
+    padding: 0 12px;
+    background: var(--art-bg-card);
+    border: 1px solid var(--art-border-color);
+    border-radius: 6px;
+    color: var(--art-text-placeholder);
+    cursor: pointer;
+    transition: var(--art-transition);
+    font-size: 13px;
+}
+
+.dark .art-search-btn {
+    background: var(--art-gray-200);
+}
+
+.art-search-btn:hover {
+    border-color: var(--art-primary);
+}
+
+.art-search-btn .art-search-text {
+    flex: 1;
+    text-align: left;
 }
 
 .art-search-hint {
     font-size: 11px;
     padding: 2px 6px;
-    background: var(--art-gray-200);
+    background: var(--art-gray-100);
     border-radius: 4px;
-    color: var(--art-text-secondary);
+    color: var(--art-text-placeholder);
 }
 
 .dark .art-search-hint {
@@ -357,15 +380,15 @@ a:hover {
 }
 
 /* Theme Toggle Icons */
-.art-theme-btn .art-icon-moon {
+.art-icon-btn .art-icon-moon {
     display: none;
 }
 
-.dark .art-theme-btn .art-icon-sun {
+.dark .art-icon-btn .art-icon-sun {
     display: none;
 }
 
-.dark .art-theme-btn .art-icon-moon {
+.dark .art-icon-btn .art-icon-moon {
     display: block;
 }
 
@@ -1234,15 +1257,26 @@ a:hover {
 }
 
 /* ============================================
-   Top Tabs Bar (Browser-like tabs)
+   Tabs Bar (Layer 2) - Browser-like tabs
    ============================================ */
+.art-tabs-bar-wrapper {
+    display: flex;
+    align-items: center;
+    height: 44px;
+    padding: 0 16px;
+    background: var(--art-bg-page);
+    border-bottom: none;
+    flex-shrink: 0;
+    overflow: hidden;
+}
+
 .art-tabs-bar {
     display: flex;
     align-items: center;
-    gap: 0;
+    gap: 8px;
     flex: 1;
-    min-width: 0; /* Allow shrinking */
-    overflow: hidden;
+    min-width: 0;
+    overflow-x: auto;
 }
 
 .art-tabs-bar::-webkit-scrollbar {
@@ -1253,13 +1287,13 @@ a:hover {
     display: flex;
     align-items: center;
     gap: 6px;
-    padding: 8px 10px;
-    min-width: 0; /* Allow shrinking */
-    max-width: 180px;
-    flex: 0 1 auto;
-    background: transparent;
-    border: none;
-    border-right: 1px solid var(--art-border-light);
+    padding: 7px 14px;
+    min-width: 0;
+    max-width: 160px;
+    flex: 0 0 auto;
+    background: var(--art-bg-card);
+    border: 1px solid var(--art-border-color);
+    border-radius: 6px;
     color: var(--art-text-secondary);
     font-size: 13px;
     cursor: pointer;
@@ -1269,25 +1303,20 @@ a:hover {
 }
 
 .art-tab-item:hover {
-    background: var(--art-bg-hover);
     color: var(--art-text-primary);
+    border-color: var(--art-gray-400);
 }
 
 .art-tab-item.active {
-    background: var(--art-bg-base);
+    background: var(--art-bg-card);
+    border-color: var(--art-primary);
     color: var(--art-primary);
     font-weight: 500;
-    position: relative;
 }
 
-.art-tab-item.active::after {
-    content: '';
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    height: 2px;
-    background: var(--art-primary);
+.art-tab-item.fixed {
+    background: var(--art-bg-card);
+    border-color: var(--art-border-color);
 }
 
 .art-tab-item .art-tab-method {
@@ -1299,11 +1328,11 @@ a:hover {
     flex-shrink: 0;
 }
 
-.art-tab-item .art-tab-method.get { background: var(--art-info-bg); color: var(--art-info); }
-.art-tab-item .art-tab-method.post { background: var(--art-warning-bg); color: var(--art-warning); }
-.art-tab-item .art-tab-method.put { background: var(--art-success-bg); color: var(--art-success); }
-.art-tab-item .art-tab-method.delete { background: var(--art-danger-bg); color: var(--art-danger); }
-.art-tab-item .art-tab-method.patch { background: var(--art-purple-100); color: var(--art-purple-600); }
+.art-tab-item .art-tab-method.get { background: rgba(19, 222, 185, 0.15); color: var(--art-method-get); }
+.art-tab-item .art-tab-method.post { background: rgba(93, 135, 255, 0.15); color: var(--art-method-post); }
+.art-tab-item .art-tab-method.put { background: rgba(255, 174, 31, 0.15); color: var(--art-method-put); }
+.art-tab-item .art-tab-method.delete { background: rgba(255, 77, 79, 0.15); color: var(--art-method-delete); }
+.art-tab-item .art-tab-method.patch { background: rgba(180, 141, 243, 0.15); color: var(--art-method-patch); }
 
 .art-tab-item .art-tab-title {
     flex: 1;
