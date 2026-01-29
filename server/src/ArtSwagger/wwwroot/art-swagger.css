@@ -1646,7 +1646,6 @@ a:hover {
 .art-action-bar-top {
     padding: 0 0 16px 0;
     margin-bottom: 0;
-    border-bottom: 1px solid var(--art-border-color);
 }
 
 .art-btn-execute {
