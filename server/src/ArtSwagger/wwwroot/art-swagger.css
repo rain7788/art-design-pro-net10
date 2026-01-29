@@ -586,7 +586,7 @@ a:hover {
 
 .art-nav-tag-name {
     flex: 1;
-    font-weight: 400;
+    font-weight: 500;
     color: var(--art-text-primary);
     font-size: 14px;
 }
@@ -689,7 +689,7 @@ a:hover {
 .art-nav-item-path {
     flex: 1;
     font-size: 13px;
-    color: var(--art-text-regular);
+    color: var(--art-text-primary);
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
@@ -1126,13 +1126,14 @@ a:hover {
 /* Code Block */
 .art-code-block {
     position: relative;
-    background: var(--art-gray-900);
+    background: var(--art-gray-100);
+    border: 1px solid var(--art-border-color);
     border-radius: var(--art-border-radius);
     overflow: hidden;
 }
 
 .dark .art-code-block {
-    background: #0d0d0d;
+    background: var(--art-gray-200);
 }
 
 .art-code-header {
@@ -1140,13 +1141,13 @@ a:hover {
     align-items: center;
     justify-content: space-between;
     padding: 8px 16px;
-    background: rgba(255, 255, 255, 0.05);
-    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    background: var(--art-gray-200);
+    border-bottom: 1px solid var(--art-border-light);
 }
 
 .art-code-lang {
     font-size: 11px;
-    color: rgba(255, 255, 255, 0.5);
+    color: var(--art-text-secondary);
     text-transform: uppercase;
 }
 
@@ -1158,15 +1159,15 @@ a:hover {
     background: transparent;
     border: none;
     border-radius: 4px;
-    color: rgba(255, 255, 255, 0.6);
+    color: var(--art-text-secondary);
     font-size: 11px;
     cursor: pointer;
     transition: var(--art-transition-fast);
 }
 
 .art-code-copy:hover {
-    background: rgba(255, 255, 255, 0.1);
-    color: white;
+    background: var(--art-bg-hover);
+    color: var(--art-text-primary);
 }
 
 .art-code-copy .art-icon {
@@ -1184,7 +1185,7 @@ a:hover {
     font-family: 'SF Mono', Monaco, Consolas, monospace;
     font-size: 12px;
     line-height: 1.6;
-    color: #e6e6e6;
+    color: var(--art-text-primary);
     white-space: pre-wrap;
     word-break: break-word;
 }
